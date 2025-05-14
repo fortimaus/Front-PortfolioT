@@ -144,7 +144,7 @@ export default {
 
 <style scoped>
 .achievement-image {
-  max-height: 500px;
+  height: 500px;
   object-fit: contain;
   background-color: #f8f9fa;
 }

@@ -24,7 +24,6 @@
         <section class="section">
             <div class="container-fliud">
                 <img alt="Vue logo" class="rounded-circle" 
-                    v-bind:style="styleObj"
                     v-bind:src="avatar">
                 <h1>{{ this.login }}</h1>
                 <h5>{{ this.about }}</h5>            
@@ -42,6 +41,24 @@
             <div class="d-grid gap-4">
                 <div v-if="this.repos.length > 0"  class="container repos py-4">
                 <h2>Репозитории</h2>
+                
+                <div class="row gap-2 m-5">
+                    <div class="btn-group col">
+                      <button class="btn btn-info col" type="button" @click="generateRepos()">
+                        Обновить все
+                      </button>
+                      <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                          <span class="visually-hidden">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownRepos" >
+                        <li v-for="option in this.repoServices" :key="option.id">
+                          <a class=" dropdown-item px-5" @click="generateRepoService(option.id)">Обновить сервис {{option.title}}</a>
+                        </li>
+                      </ul>
+                    </div>
+                    <button class="btn btn-light col" type="button" @click="showCompareModal">Сравнить</button>
+                </div>
+                
                 <div class="row">
                     <div class="col-md-3 " v-for="repo in repos" v-bind:key="repo.id" >
                             <BasicCard
@@ -51,8 +68,11 @@
                             @showInfo="showRepoInfo(repo)"
                             >
                                 <div class="d-grid mx-4 gap-2">
-                                    <button type="button" class="btn btn-outline-secondary" @click="showRepo(repo.id)">
+                                    <button type="button" class="btn btn-outline-secondary" @click="showRepoUpdateModal(repo.id)">
                                         Редактировать
+                                    </button>
+                                    <button type="button" class="btn btn-outline-info" @click="showRatingModal(repo.id)">
+                                        Подробности
                                     </button>
                                     <button type="button" class="btn btn-danger" @click="deleteRepo(repo.id)">
                                         Удалить
@@ -66,6 +86,22 @@
             </div>
             <div v-if="this.articles.length > 0"  class="container articles py-4">
                 <h2>Статьи</h2>
+                <div class="row gap-2 m-5">
+                    <div class="btn-group col">
+                      <button class="btn btn-info col" type="button" @click="generateArticles()">
+                        Обновить все
+                      </button>
+                      <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                          <span class="visually-hidden">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownRepos" >
+                        <li v-for="option in this.articleServices" :key="option.id">
+                          <a class=" dropdown-item px-5" @click="generateArticleService(option.id)">Обновить сервис {{option.title}}</a>
+                        </li>
+                      </ul>
+                    </div>
+                </div>
+                
                 <div class="row">
                     <div class="col-md-3" v-for="article in articles" v-bind:key="article.id" >
                             <BasicCard
@@ -75,7 +111,7 @@
                             @showInfo="showArticleInfo(article)"
                             >
                                 <div class="d-grid mx-4 gap-2">
-                                    <button type="button" class="btn btn-outline-secondary" @click="showArticleInfo(article)">
+                                    <button type="button" class="btn btn-outline-secondary" @click="showArticleUpdateModal(article.id)">
                                         Редактировать
                                     </button>
                                     <button type="button" class="btn btn-danger" @click="deleteArticle(article.id)">
@@ -100,7 +136,7 @@
                             @showInfo="showAchievementInfo(ach)"
                             >
                                 <div class="d-grid mx-4 gap-2">
-                                    <button type="button" class="btn btn-outline-secondary" @click="showAchievementInfo(ach)">
+                                    <button type="button" class="btn btn-outline-secondary" @click="showAchUpdateModal(ach.id)">
                                         Редактировать
                                     </button>
                                     <button type="button" class="btn btn-danger" @click="deleteAch(ach.id)">
@@ -121,16 +157,33 @@
     </div>
     <AchievementModal 
       ref="achievementModal"
-      @achievement-created="handleNewAchievement"
+      @achievement-created="getAchievements"
     />
     <AchievementViewModal 
       ref="achievementViewModal"
       :achievementData="currentAchievement"
     />
-    <showUpdate ref="artUp" @close="updateArt"></showUpdate>
-    <showUpdate ref="repoUp" @close="updateRepo"></showUpdate>
-    <showUpdate ref="createAch" @close="createNew"></showUpdate>
-    <achInfo ref="info"></achInfo>
+    <UpdateRepoModal 
+      ref="updateRepoModal"
+      @repo-update="getRepos"
+    />
+    <UpdateArticleModal 
+      ref="updateArticleModal"
+      @artcile-update="getArticles"
+    />
+    <UpdateAchModal 
+      ref="updateAchModal"
+      @ach-update="getAchievements"
+    />
+    <RepoUpdateServiceModal
+        ref="repoUpdateServiceModal"
+        @repo-service="generateRepoService"
+    />
+    <RepositoryRatingModal 
+      ref="ratingModal"
+      @save-rating="handleSaveRating"
+    />
+    <CompareUsersModal ref="compareModal" />
     <userUpdate ref="userUpdate" @close="updUser"></userUpdate>
     <user_list ref="listUs"></user_list>
     <spinner ref="spin"></spinner>
@@ -140,14 +193,17 @@ import AchievementService from '../../services/AchievementService';
 import UserService from '../../services/UserService';
 import RepoService from '@/services/RepoService';
 import ArticleService from '@/services/ArticleService';
-//import LinkService from '@/services/LinkService';
+import LinkService from '@/services/LinkService';
 
 import BasicCard from '../cards/BasicCard.vue'
 import AchievementModal from '../modals/AchievementModal.vue'
 import AchievementViewModal from '../modals/AchievementViewModal.vue'
+import UpdateRepoModal from '../modals/UpdateRepoModal.vue';
+import UpdateArticleModal from '../modals/UpdateArticleModal.vue';
+import UpdateAchModal from '../modals/UpdateAchModal.vue';
+import CompareUsersModal from '../modals/CompareUsersModal.vue'
+import RepositoryRatingModal from '../modals/RepositoryRatingModal.vue'
 
-import showUpdate from '../modals/showUpdate.vue'
-import achInfo from '../cards/achInfo.vue'
 import userUpdate from '../modals/userUpdate.vue';
 import user_list from '../modals/user_list.vue';
 import spinner from '../spinner.vue';
@@ -157,9 +213,12 @@ export default {
     BasicCard,
     AchievementModal,
     AchievementViewModal,
+    UpdateRepoModal,
+    UpdateArticleModal,
+    UpdateAchModal,
+    CompareUsersModal,
+    RepositoryRatingModal,
 
-    showUpdate,
-    achInfo,
     userUpdate,
     user_list,
     spinner
@@ -179,15 +238,16 @@ export default {
             else
             {
                 this.avatar = `data:image/png;base64,${response.data.preview}`;
-            }
-                
+            }       
         })
         .catch(error =>{
             console.log(error)
             alert("Ваш токен устарел")
             this.$router.push("/login");
         })
-        this.getInfo()
+        await this.getInfo()
+        await this.getRepoService()
+        await this.getArticleService()
     },
     data() {
       return {
@@ -201,6 +261,7 @@ export default {
         repos:[],
         articles: [],
         achievements: [],
+
         currentAchievement: {
             title: '',
             description: '',
@@ -208,22 +269,10 @@ export default {
             additionalInfo: null,
             images: []
         },
-        ulstu: "VoldemarProger",
-        gitHub: "fortimaus",
-        elib: "Романов-2020-2023",        
-        scope: 0,
-        currentArt : -1,
-        currentRepo : -1,
-        midR: 0,
-        midA: 0,
+        repoServices:[],
+        articleServices:[],
+        
       };
-    },
-    computed:{
-        styleObj(){
-            return {
-                'border': '18px ' + 'outset ' + 'rgb('+ (125 * this.scope / 100) + ',' + (255 * (this.scope) / 100) + ',' + 0 + ',' + 0.15 + ')'
-            }
-        }
     },
     methods: {
         exit(){
@@ -258,6 +307,26 @@ export default {
               console.log("Repos: " + e)
             })
         },
+        async getRepoService(){
+            await LinkService.getTypes(1)
+                .then(response => {
+                    console.log(response.data)
+                    this.repoServices = response.data
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        },
+        async getArticleService(){
+            await LinkService.getTypes(2)
+                .then(response => {
+                    console.log(response.data)
+                    this.articleServices = response.data
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        },
         async getArticles(){
             await ArticleService.getbyUser(localStorage.getItem('user'))
             .then(response => {
@@ -291,29 +360,84 @@ export default {
                 .catch(error => console.log("Ach: " + error))
         },
         async getInfo(){
+            await this.getAchievements();
             await this.getRepos();
             await this.getArticles();
-            await this.getAchievements();
             this.$refs.spin.closeModal();
         },
-        async handleNewAchievement(){
-            await AchievementService.getbyUser(localStorage.getItem('user'))
-                .then(response => {
-                    this.achievements = []
-                    response.data.forEach(element =>{
-                    if(element.preview == null)
-                        element.preview = this.default_image_ach
-                    else{
-                        element.preview = `data:image/png;base64,${element.preview}`
-                    }
-                    
-                    this.achievements.push(element)
-                })
-                })
-                .catch(error => console.log("Ach: " + error))
+        async generateRepos(){
+            this.$refs.spin.show = true
+            await RepoService.generate(localStorage.getItem('user'))
+            .then(response => {
+                console.log(response)
+                this.getRepos();
+                this.$refs.spin.closeModal()
+            })
+            .catch(error => {
+                this.$refs.spin.closeModal()
+                console.log(error)
+                alert("Произошла ошибка")
+            })
+        },
+        async generateArticles(){
+            this.$refs.spin.show = true
+            await ArticleService.generate(localStorage.getItem('user'))
+            .then(response => {
+                console.log(response)
+                this.getArticles();
+                this.$refs.spin.closeModal()
+            })
+            .catch(error => {
+                this.$refs.spin.closeModal()
+                console.log(error)
+                alert("Произошла ошибка")
+            })
+        },
+        async generateRepoService(id){
+            this.$refs.spin.show = true
+            await RepoService.generateService(localStorage.getItem('user'),id)
+            .then(response => {
+                console.log(response)
+                this.getRepos();
+                this.$refs.spin.closeModal()
+            })
+            .catch(error =>{
+                this.$refs.spin.closeModal()
+                console.log(error)
+                alert("Произошла ошибка")
+            })
+        },
+        async generateArticleService(id){
+            this.$refs.spin.show = true
+            await ArticleService.generateService(localStorage.getItem('user'),id)
+            .then(response => {
+                console.log(response)
+                this.getArticles();
+                this.$refs.spin.closeModal()
+            })
+            .catch(error =>{
+                this.$refs.spin.closeModal()
+                console.log(error)
+                alert("Произошла ошибка")
+            })
         },
         showAchievementModal() {
           this.$refs.achievementModal.show()
+        },
+        showRepoUpdateModal(id) {
+          this.$refs.updateRepoModal.show(id)
+        },
+        showArticleUpdateModal(id) {
+          this.$refs.updateArticleModal.show(id)
+        },
+        showAchUpdateModal(id) {
+          this.$refs.updateAchModal.show(id)
+        },
+        showCompareModal() {
+          this.$refs.compareModal.show()
+        },
+        showRatingModal(id) {
+            this.$refs.ratingModal.show(id)
         },
         async deleteRepo(id){
             await RepoService.delete(id)
@@ -424,6 +548,7 @@ export default {
     .rounded-circle{
         height: 20%;
         width: 20%;
+        border: 15px  outset rgb(0, 0, 0, 0.15 )
     }
     .protfolio{
         border-top: 1rem solid #d3d3d3;

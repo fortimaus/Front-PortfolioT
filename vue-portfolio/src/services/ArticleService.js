@@ -17,11 +17,11 @@ class ArticleService {
     return axios.delete( `/articles/delete/${id}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
   }
   generate(id) {
-    return axios.post( `/articles/generate?id=${id}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
+    return axios.post( `/articles/generate?id=${id}`,{},{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
   } 
 
   generateService(userId,serviceId) {
-    return axios.post( `/articles/generate_service?userId=${userId}&serviceId=${serviceId}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
+    return axios.post( `/articles/generate_service?userId=${userId}&serviceId=${serviceId}`,{},{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
   } 
 
 
