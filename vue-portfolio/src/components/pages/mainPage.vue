@@ -22,12 +22,30 @@
       </nav>
 <div>
         <section class="section">
+            <AvatarWithStatus 
+            :avatar-url="avatar"
+            :username="login"
+            :status="status"
+            size="xl"
+          />
             <div class="container-fliud">
-                <img alt="Vue logo" class="rounded-circle" 
-                    v-bind:src="avatar">
                 <h1>{{ this.login }}</h1>
                 <h5>{{ this.about }}</h5>            
             </div>
+            <i class="bi bi-chat-dots"></i>
+            <div class="d-flex justify-content-center gap-3">
+              <button type="button" class="btn btn-outline-primary px-4 py-2" @click="showUserStatsModal">
+                Статистика
+              </button>
+
+            <button type="button" class="btn btn-outline-primary px-4 py-2" @click="showMessages">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-right-dots" viewBox="0 0 16 16">
+                  <path d="M2 1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h9.586a2 2 0 0 1 1.414.586l2 2V2a1 1 0 0 0-1-1H2zm12-1a2 2 0 0 1 2 2v12.793a.5.5 0 0 1-.854.353l-2.853-2.853a1 1 0 0 0-.707-.293H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12z"/>
+                  <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                </svg>
+              </button>
+            </div>
+
         </section>
         <section class="protfolio d-grid gap-4">
             <h1>Портфолио</h1>
@@ -181,7 +199,12 @@
     />
     <RepositoryRatingModal 
       ref="ratingModal"
-      @save-rating="handleSaveRating"
+    />
+    <UserStatsModal 
+      ref="statsModal"
+    />
+    <MessagesModal 
+      ref="messagesModal"
     />
     <CompareUsersModal ref="compareModal" />
     <userUpdate ref="userUpdate" @close="updUser"></userUpdate>
@@ -203,6 +226,10 @@ import UpdateArticleModal from '../modals/UpdateArticleModal.vue';
 import UpdateAchModal from '../modals/UpdateAchModal.vue';
 import CompareUsersModal from '../modals/CompareUsersModal.vue'
 import RepositoryRatingModal from '../modals/RepositoryRatingModal.vue'
+import UserStatsModal from '../modals/UserStatsModal.vue'
+import MessagesModal from '../modals/MessageModal.vue'
+
+import AvatarWithStatus from '../elements/AvatarWithStatus.vue'
 
 import userUpdate from '../modals/userUpdate.vue';
 import user_list from '../modals/user_list.vue';
@@ -218,6 +245,10 @@ export default {
     UpdateAchModal,
     CompareUsersModal,
     RepositoryRatingModal,
+    UserStatsModal,
+    MessagesModal,
+
+    AvatarWithStatus,
 
     userUpdate,
     user_list,
@@ -233,6 +264,7 @@ export default {
         .then(response => {
             this.login = response.data.login;
             this.about = response.data.about;
+            this.status = this.statuses[response.data.status]
             if(response.data.preview == null)
                 this.avatar = "https://ds4-sosnovoborsk-r04.gosweb.gosuslugi.ru/netcat_files/21/10/blankdirectory_3.png"
             else
@@ -251,10 +283,11 @@ export default {
     },
     data() {
       return {
+        statuses: ['unverified', 'verified', 'warning', 'error'],
         login: null,
         about: null,
         avatar: null,
-
+        status:0,
         default_image_repo: "https://camo.githubusercontent.com/4e748a1a647da2caf4aa61d6b8f73ecd34af304ca94b4542d606b37dcaf72ccb/68747470733a2f2f63646e2e776f726c64766563746f726c6f676f2e636f6d2f6c6f676f732f6769742d69636f6e2e737667",
         default_image_article: "https://sun1-25.userapi.com/s/v1/ig2/-Cx7oKn0kXnxtusDrlNwcMK2jPQt0T2x7p5ysmpsyEfTPDJgK3YopmTiD5ntLlKBWx3kXOY-7K_3hNF3y8BWJ1wK.jpg?size=1067x1067&quality=95&crop=0,0,1067,1067&ava=1",
         default_image_ach: "https://vimk.ddu2.minskedu.gov.by/files/01268/obj/110/37623/img/unnamed_1.jpg",
@@ -439,6 +472,12 @@ export default {
         showRatingModal(id) {
             this.$refs.ratingModal.show(id)
         },
+        showUserStatsModal() {
+            this.$refs.statsModal.show(localStorage.getItem('user'))
+        },
+        showMessages() {
+            this.$refs.messagesModal.show(localStorage.getItem('user'))
+        },
         async deleteRepo(id){
             await RepoService.delete(id)
             .then(response =>{
@@ -545,11 +584,7 @@ export default {
         padding-top: 10%;
         padding-bottom: 10%;
     }
-    .rounded-circle{
-        height: 20%;
-        width: 20%;
-        border: 15px  outset rgb(0, 0, 0, 0.15 )
-    }
+
     .protfolio{
         border-top: 1rem solid #d3d3d3;
         background-color: #b4b4bd17;

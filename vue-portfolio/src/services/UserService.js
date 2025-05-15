@@ -24,6 +24,10 @@ class UserService {
         return axios.get( `/users/${id}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
     }
 
+    stats(id) {
+        return axios.get( `/users/stats/${id}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
+    }
+
     update(data) {
         return axios.put( `/users/update`,data,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
     }

@@ -411,21 +411,7 @@ export default {
       })
       
     },
-    saveRating() {
-      this.$emit('save-rating', {
-        rating: this.rating,
-        remarks: this.remarks
-      })
-      this.hide()
-    },
-    updateRating(newRating) {
-      this.rating = newRating
-    },
-    addRemark(newRemark) {
-      if (newRemark && !this.remarks.includes(newRemark)) {
-        this.remarks.push(newRemark)
-      }
-    }
+
   },
   
   beforeUnmount() {
