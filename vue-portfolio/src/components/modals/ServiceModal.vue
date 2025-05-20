@@ -8,16 +8,16 @@
         </div>
         <div class="modal-body">
           <form @submit.prevent="saveService">
-            <div class="mb-3">
+            <div v-if="!editMode" class="mb-3">
               <label class="form-label">Сервис</label>
               <select class="form-select" v-model="service.type" required>
-                <option value="gitulstu">Git UlSTU</option>
-                <option value="github">GitHub</option>
-                <option value="elib">Elib UlSTU</option>
+                <option v-for="item in this.services" :key="item.id" :value="item.id"> {{ item.title }} </option>
               </select>
             </div>
-
-            <div v-if="service.type === 'elib'">
+            <div v-else class="mb-3">
+              <label class="form-label">Сервис {{ (services.find(x => x.id == service.type)).title }}</label>
+            </div>
+            <div v-if="service.type == 3">
               <div class="mb-3">
                 <label class="form-label">ФИО</label>
                 <input type="text" class="form-control" v-model="service.fio" required>
@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import LinkService from '@/services/LinkService'
 import { Modal } from 'bootstrap'
 
 export default {
@@ -59,23 +60,40 @@ export default {
   data() {
     return {
       service: {
-        type: 'gitulstu',
+        type: 1,
         login: '',
         fio: '',
         startYear: new Date().getFullYear(),
         endYear: new Date().getFullYear() + 4
       },
+      services: [],
       editMode: false,
       modalInstance: null
     }
   },
-  mounted() {
+  async mounted() {
+    await LinkService.getAllTypes()
+    .then(response =>{
+      this.services = response.data
+    })
     this.modalInstance = new Modal(document.getElementById('serviceModal'))
   },
   methods: {
-    show(serviceData = null) {
-      if (serviceData) {
-        this.service = JSON.parse(JSON.stringify(serviceData))
+    async show(id = null) {
+      if (id) {
+        await LinkService.get(localStorage.getItem('user'),id)
+        .then(response =>{
+          this.service.type = response.data.serviceId
+          if(response.data.serviceId == 3)
+          {
+            let arr = response.data.data.split("-")
+            this.service.fio = arr[0]
+            this.service.startYear = arr[1]
+            this.service.endYear = arr[2]
+          }
+          else if(response.data.serviceId == 1 || response.data.serviceId == 2)
+            this.service.login = response.data.data
+        })
         this.editMode = true
       } else {
         this.resetForm()
@@ -88,17 +106,70 @@ export default {
     },
     resetForm() {
       this.service = {
-        type: 'gitulstu',
+        type: 1,
         login: '',
         fio: '',
         startYear: new Date().getFullYear(),
         endYear: new Date().getFullYear() + 4
       }
     },
-    saveService() {
-      this.$emit('save-service', { ...this.service })
-      this.hide()
+    async update(){
+      let data = ''
+      if(this.service.type == 1 || this.service.type == 2)
+        data = this.service.login
+      else if(this.service.type == 3)
+        data = `${this.service.fio}-${this.service.startYear}-${this.service.endYear}`
+      let update_data = {
+        userId: localStorage.getItem('user'),
+        serviceId : this.service.type,
+        data: data
+      }
+      await LinkService.update(update_data)
+      .then(response =>{
+        console.log(response)
+        this.$emit('save-service')
+        this.hide()
+      })
+      .catch(error =>{
+        console.log(error)
+        alert("Что-то пошло не так")
+      })
+    },
+    async save(){
+      let data = ''
+      if(this.service.type == 1 || this.service.type == 2)
+        data = this.service.login
+      else if(this.service.type == 3)
+        data = `${this.service.fio}-${this.service.startYear}-${this.service.endYear}`
+      let create_data = {
+        userId: localStorage.getItem('user'),
+        serviceId : this.service.type,
+        data: data
+      }
+      console.log(create_data)
+      await LinkService.create(create_data)
+      .then(response =>{
+        console.log(response)
+        this.$emit('save-service')
+        this.hide()
+      })
+      .catch(error =>{
+        console.log(error)
+        alert("Что-то пошло не так")
+      })
+      
+    },
+    async saveService() {
+      if(this.editMode)
+        await this.update()
+      else
+        await this.save()
     }
   }
 }
 </script>
+<style scoped>
+.modal {
+  background-color: rgba(0, 0, 0, 0.455);
+}
+</style>

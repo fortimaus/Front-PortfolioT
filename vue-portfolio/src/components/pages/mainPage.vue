@@ -12,7 +12,7 @@
                   <a class="nav-link" @click="showSettings()">Настройки</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" @click="showListUsers()">Список пользователей</a>
+                  <a class="nav-link" @click="showUserList()">Список пользователей</a>
                 </li>
             </div>
           <div class="d-flex navbar-brand">
@@ -206,6 +206,12 @@
     <MessagesModal 
       ref="messagesModal"
     />
+    <SettingsModal 
+        ref="settingsModal"
+    />
+    <UserRatingModal
+        ref="userRatingModal"
+        />
     <CompareUsersModal ref="compareModal" />
     <userUpdate ref="userUpdate" @close="updUser"></userUpdate>
     <user_list ref="listUs"></user_list>
@@ -228,11 +234,10 @@ import CompareUsersModal from '../modals/CompareUsersModal.vue'
 import RepositoryRatingModal from '../modals/RepositoryRatingModal.vue'
 import UserStatsModal from '../modals/UserStatsModal.vue'
 import MessagesModal from '../modals/MessageModal.vue'
-
+import SettingsModal from '../modals/SettingsModal.vue';
 import AvatarWithStatus from '../elements/AvatarWithStatus.vue'
+import UserRatingModal from '../modals/UserRatingModal.vue';
 
-import userUpdate from '../modals/userUpdate.vue';
-import user_list from '../modals/user_list.vue';
 import spinner from '../spinner.vue';
 export default {
     name: "achs-list",
@@ -247,11 +252,11 @@ export default {
     RepositoryRatingModal,
     UserStatsModal,
     MessagesModal,
+    SettingsModal,
+    UserRatingModal,
 
     AvatarWithStatus,
 
-    userUpdate,
-    user_list,
     spinner
     },
     beforeCreate() {
@@ -477,6 +482,12 @@ export default {
         },
         showMessages() {
             this.$refs.messagesModal.show(localStorage.getItem('user'))
+        },
+        showSettings() {
+            this.$refs.settingsModal.show()
+        },
+        showUserList() {
+            this.$refs.userRatingModal.show()
         },
         async deleteRepo(id){
             await RepoService.delete(id)

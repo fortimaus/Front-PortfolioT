@@ -82,28 +82,27 @@
               </div>
 
               <div class="list-group">
-                <div v-for="(service, index) in user.services" :key="index" class="list-group-item">
+                <div v-for="(service, index) in services" :key="index" class="list-group-item">
                   <div class="d-flex justify-content-between align-items-center">
                     <div>
-                      <strong>{{ getServiceName(service.type) }}</strong>
-                      <div v-if="service.type === 'elib'">
-                        {{ service.fio }}, {{ service.startYear }}-{{ service.endYear }}
-                      </div>
-                      <div v-else>
-                        {{ service.login }}
-                      </div>
+                      <strong>{{service.serviceName}}</strong>
                     </div>
                     <div>
-                      <button class="btn btn-sm btn-outline-secondary me-2" @click="editService(index)">
-                        <i class="bi bi-pencil"></i>
+                      <p>
+                        {{service.data}}
+                      </p>
+                    </div>
+                    <div>
+                      <button class="btn btn-sm btn-outline-secondary me-2" @click="editService(service.serviceId)">
+                        <strong>Ред.</strong>
                       </button>
-                      <button class="btn btn-sm btn-outline-danger" @click="removeService(index)">
-                        <i class="bi bi-trash"></i>
+                      <button class="btn btn-sm btn-outline-danger" @click="removeService(service.serviceId)">
+                        <strong>X</strong>
                       </button>
                     </div>
                   </div>
                 </div>
-                <div v-if="user.services.length === 0" class="list-group-item text-muted text-center">
+                <div v-if="services.length === 0" class="list-group-item text-muted text-center">
                   Нет подключенных сервисов
                 </div>
               </div>
@@ -125,7 +124,8 @@
 import { Modal } from 'bootstrap'
 import ServiceModal from './ServiceModal.vue'
 import EmailConfirmationModal from './EmailConfirmationModal.vue'
-
+import UserService from '@/services/UserService'
+import LinkService from '@/services/LinkService'
 export default {
   name: "EditUser",
   components: {
@@ -134,16 +134,16 @@ export default {
   },
   data() {
     return {
-      defaultAvatar: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
       showPassword: false,
       user: {
-        login: 'fort',
-        password: '12345',
-        info: 'hekko',
+        login: '',
+        password: '',
+        info: '',
         avatar: '',
-        email: 'vlad@mail.ru',
-        services: []
+        email: '',
+        
       },
+      services: [],
       editServiceIndex: null,
       modalInstance: null
     }
@@ -152,7 +152,27 @@ export default {
     this.modalInstance = new Modal(document.getElementById('editUserModal'))
   },
   methods: {
-    show() {
+    async show() {
+      await UserService.get(localStorage.getItem('user'))
+    .then(response =>
+      {
+        this.user.login = response.data.login
+        this.user.password = response.data.password
+        this.user.email = response.data.email
+        this.user.info = response.data.about
+        if(response.data.preview == null)
+                this.avatar = null
+            else
+            {
+                this.user.avatar = `data:image/png;base64,${response.data.preview}`;
+            }       
+        
+      } 
+    )
+      await LinkService.getbyUser(localStorage.getItem('user'))
+      .then(response => {
+        this.services = response.data
+      })
       this.modalInstance.show()
     },
     hide() {
@@ -168,12 +188,43 @@ export default {
         reader.readAsDataURL(file)
       }
     },
-    updateEmail() {
-      this.$refs.emailConfirmationModal.show(this.user.email)
+    async updateEmail() {
+      await UserService.updateEmail(localStorage.getItem('user'), this.user.email)
+      .then(response => {
+        this.$refs.emailConfirmationModal.show(this.user.email)
+        console.log(response)
+      })
+      .catch(error => {
+        alert("Что-то пошло не так! Возможно данная почта уже занята")
+        console.log(error)
+      })
+      
     },
     saveProfile() {
-      // Сохранение данных
-      this.hide()
+      let imagePreview = null;
+
+      if(this.user.avatar != null){
+        let arr = this.user.avatar.split(",");
+        imagePreview = arr[1];
+      }
+
+      let data = {
+        Id : localStorage.getItem('user'),
+        login: this.user.login,
+        password: this.user.password,
+        about: this.user.info,
+        preview:imagePreview
+      }
+      UserService.update(data)
+      .then(response => {
+        console.log(response)
+        alert("Данные успешно обновлены")
+        this.hide();
+      })
+      .catch(error => {
+        console.log(error)
+        alert("Произошла ошибка")
+      })
     },
     showAddServiceModal() {
       this.editServiceIndex = null
@@ -181,17 +232,26 @@ export default {
     },
     editService(index) {
       this.editServiceIndex = index
-      this.$refs.serviceModal.show(this.user.services[index])
+      this.$refs.serviceModal.show(index)
     },
-    removeService(index) {
-      this.user.services.splice(index, 1)
+    async removeService(serviceId) {
+      await LinkService.delete(localStorage.getItem('user'),serviceId)
+      .then(response => {
+        console.log(response)
+        LinkService.getbyUser(localStorage.getItem('user'))
+        .then(links => {
+          this.services = links.data
+        })
+      })
+      .catch(error => {
+        console.log(error.data)
+      })
     },
-    handleServiceSave(serviceData) {
-      if (this.editServiceIndex !== null) {
-        this.user.services[this.editServiceIndex] = serviceData
-      } else {
-        this.user.services.push(serviceData)
-      }
+    async handleServiceSave() {
+      await LinkService.getbyUser(localStorage.getItem('user'))
+        .then(links => {
+          this.services = links.data
+        })
     },
     getServiceName(type) {
       const names = {

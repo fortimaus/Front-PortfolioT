@@ -123,10 +123,31 @@
               </div>
             </div>
 
+            <div class="col-md-6 mb-4">
+              <div class="card h-100">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">Соотношение ваших языков программирования</h6>
+                </div>
+                <div class="card-body">
+                  <canvas ref="myRepoLanguages"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+              <div class="card h-100">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">Соотношение языков программирования пользователей</h6>
+                </div>
+                <div class="card-body">
+                  <canvas ref="allRepoLanguages"></canvas>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           
-
 
         </div>
         <div class="modal-footer">
@@ -457,11 +478,49 @@ export default {
         }
       })
       //
-    }
+      const myLanguageCtx = this.$refs.myRepoLanguages.getContext('2d')
+      this.myRepoLanguages = new Chart(myLanguageCtx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(this.userData.repoInfo.languageCounts),
+          datasets: [{
+            data: Object.values(this.userData.repoInfo.languageCounts),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right'
+            }
+          }
+        }
+      })
+      const allLanguageCtx = this.$refs.allRepoLanguages.getContext('2d')
+      this.allRepoLanguages = new Chart(allLanguageCtx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(this.averageData.repoInfo.languageCounts),
+          datasets: [{
+            data: Object.values(this.averageData.repoInfo.languageCounts),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right'
+            }
+          }
+        }
+      })
   },
   beforeUnmount() {
     this.clearChart()
-  }
+  },
+}
 }
 </script>
 

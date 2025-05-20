@@ -1,6 +1,6 @@
 <template>
   <div class="modal fade" id="emailConfirmationModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Подтверждение email</h5>
@@ -23,9 +23,9 @@
             >
           </div>
 
-          <div class="text-center">
-            <a href="#" @click.prevent="resendCode">Отправить код повторно</a>
-          </div>
+        </div>
+        <div v-if="error" class="alert alert-danger mb-0">
+                {{ error }}
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
@@ -38,13 +38,14 @@
 
 <script>
 import { Modal } from 'bootstrap'
-
+import UserService from '@/services/UserService'
 export default {
   name: 'EmailConfirmationModal',
   data() {
     return {
       email: '',
       codeDigits: ['', '', '', '', '', ''],
+      error: null,
       modalInstance: null
     }
   },
@@ -83,15 +84,18 @@ export default {
         this.$refs.codeInputs[index - 1].focus()
       }
     },
-    resendCode() {
-      // Отправка кода повторно
-      alert('Код отправлен повторно на ' + this.email)
-    },
-    confirmCode() {
-      //const code = this.codeDigits.join('')
-      // Проверка кода
-      this.hide()
-      alert('Email успешно подтвержден!')
+    async confirmCode() {
+      await UserService.confirmNewEmail(localStorage.getItem('user'),this.codeDigits.join(""),this.email)
+      .then(response =>{
+        console.log(response)
+        this.hide()
+        alert('Email успешно подтвержден!')
+      })
+      .catch(error =>{
+        this.error = "Неверный код"
+        console.log(error)
+      })
+      
     }
   }
 }
@@ -103,5 +107,8 @@ export default {
   height: 50px;
   font-size: 1.5rem;
   font-weight: bold;
+}
+.modal{
+  background-color: rgba(0, 0, 0, 0.415);
 }
 </style>

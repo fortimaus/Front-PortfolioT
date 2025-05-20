@@ -26,13 +26,25 @@ const routes = [
   {
     path: "/:name",
     name: "myPage",
-    component: () => import("./components/pages/mypage.vue")
+    component: () => import("./components/pages/publicPage.vue")
   },
   {
     path: "/",
     name: "public",
     component: () => import("./components/pages/public.vue")
   },
+  {
+    path: "/status",
+    name: "status",
+    component: () => import("./components/pages/Moderator.vue")
+  },
+  
+  {
+    path: "/roles",
+    name: "roles",
+    component: () => import("./components/pages/admin.vue")
+  },
+  
   
 
 

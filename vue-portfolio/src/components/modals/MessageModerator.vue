@@ -6,7 +6,7 @@
           <h5 class="modal-title">Сообщения</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body p-0">
+        <div class="modal-body p-0 border-bottom">
           <!-- Список сообщений -->
           <div class="list-group list-group-flush">
             <div 
@@ -47,6 +47,22 @@
             </div>
           </div>
         </div>
+        <div class="p-3">
+            <form @submit.prevent="sendMessage">
+            <div class="input-group">
+              <textarea 
+                class="form-control" 
+                placeholder="Введите сообщение..."
+                v-model="newMessage"
+                rows="2"
+                required
+              ></textarea>
+              <button class="btn btn-primary" type="submit">
+                Отправить
+              </button>
+            </div>
+          </form>
+        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
         </div>
@@ -65,14 +81,16 @@ export default {
       modalInstance: null,
       defaultAvatar: "https://ds4-sosnovoborsk-r04.gosweb.gosuslugi.ru/netcat_files/21/10/blankdirectory_3.png",
       messages: [],
+      newMessage: '',
+      user: 0,
     }
   },
   mounted() {
     this.modalInstance = new Modal(document.getElementById('messagesModal'))
   },
   methods: {
-    async show(id) {
-      await UserService.comments(id)
+    async getComments(){
+        await UserService.comments(this.user)
       .then(response => {
         this.messages = response.data
         this.messages.forEach((element) => {
@@ -82,8 +100,29 @@ export default {
                 element.avatar = `data:image/png;base64,${element.avatar}`;
       })
         });
+    },
+    async show(id) {
+      this.user = id
+      await this.getComments()
       this.messages.reverse()
       this.modalInstance.show()
+    },
+    async sendMessage(){
+        let data = {
+            text: this.newMessage,
+            moderatorId : localStorage.getItem('user'),
+            userId: this.user
+        }
+        await UserService.createComment(data)
+        .then(response => {
+            console.log(response)
+            this.newMessage = ''
+            this.getComments()
+        })
+        .catch(error =>{
+            console.log(error)
+            alert("Произошла ошибка")
+        })
     },
     hide() {
       this.modalInstance.hide()
@@ -105,10 +144,7 @@ export default {
 <style scoped>
 .modal-content {
   border-radius: 10px;
-  max-height: 420px;
-  overflow-y: auto;
 }
-
 
 .list-group-item {
   padding: 1.25rem;
@@ -130,7 +166,7 @@ img {
   object-fit: cover;
 }
 .rounded-circle{
-    width: 64px;
-    height: 64px;
+    width: 32px;
+    height: 32px;
 }
 </style>

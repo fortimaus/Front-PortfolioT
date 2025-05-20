@@ -10,11 +10,11 @@ class UserService {
     }
     
     updateEmail(id,email) {
-        return axios.put( `/users/updateEmail?id=${id}&email=${email}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
+        return axios.put( `/users/updateEmail?id=${id}&email=${email}`,{},{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
     }
 
-    confirmNewEmail(id,email) {
-        return axios.post( `/users/confirmNewEmail?id=${id}&email=${email}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
+    confirmNewEmail(id,code,email) {
+        return axios.post( `/users/confirmNewEmail?id=${id}&code=${code}&email=${email}`,{},{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
     }
 
     login(login, password) {
@@ -42,6 +42,12 @@ class UserService {
     }
     comments(id){
         return axios.get( `/users/comments/${id}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
+    }
+    getByLogin(login){
+        return axios.get( `/users/byLogin?login=${login}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
+    }
+    getAll(){
+        return axios.get( `/users/list`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
     }
 
 }
