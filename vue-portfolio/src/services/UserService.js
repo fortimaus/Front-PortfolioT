@@ -32,10 +32,10 @@ class UserService {
         return axios.put( `/users/update`,data,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
     }
     updateRole(id,role) {
-        return axios.put( `/users/role?id=${id}&role=${role}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
+        return axios.put( `/users/role?id=${id}&role=${role}`,{},{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
     }
     updateStatus(id,status) {
-        return axios.put( `/users/status?id=${id}&status=${status}`,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
+        return axios.put( `/users/status?id=${id}&status=${status}`,{},{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});
     }
     createComment(data){
         return axios.post( `/users/comments`,data,{ headers: { Authorization: 'Bearer ' + localStorage.getItem("token")  }});

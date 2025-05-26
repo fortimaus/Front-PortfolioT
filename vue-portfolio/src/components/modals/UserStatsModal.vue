@@ -48,7 +48,7 @@
             <div class="col-md-6 mb-4">
               <div class="card h-100">
                 <div class="card-header bg-light">
-                  <h6 class="mb-0">Соотношение видов ваших работ</h6>
+                  <h6 class="mb-0">Соотношение количества видов ваших работ</h6>
                 </div>
                 <div class="card-body">
                   <canvas ref="myWorksChart"></canvas>
@@ -58,7 +58,7 @@
             <div class="col-md-6 mb-4">
               <div class="card h-100">
                 <div class="card-header bg-light">
-                  <h6 class="mb-0">Сравнение с другими</h6>
+                  <h6 class="mb-0">Сравнение количества работ среди всех пользователей</h6>
                 </div>
                 <div class="card-body">
                   <canvas ref="allWorksChart"></canvas>
@@ -72,7 +72,7 @@
             <div class="col-md-6 mb-4">
               <div class="card h-100">
                 <div class="card-header bg-light">
-                  <h6 class="mb-0">Средний балл репозиториев</h6>
+                  <h6 class="mb-0">Средний общий балл среди репозиториев</h6>
                 </div>
                 <div class="card-body">
                   <canvas ref="repoRating"></canvas>
@@ -82,7 +82,7 @@
             <div class="col-md-6 mb-4">
               <div class="card h-100">
                 <div class="card-header bg-light">
-                  <h6 class="mb-0">Средние оценки репозиториев</h6>
+                  <h6 class="mb-0">Средние оценки репозиториев (по 5ти бальной шкале)</h6>
                 </div>
                 <div class="card-body">
                   <canvas ref="repoScopes"></canvas>
@@ -93,7 +93,7 @@
             <div class="col-md-6 mb-4">
               <div class="card h-100">
                 <div class="card-header bg-light">
-                  <h6 class="mb-0">Среднее качество кода репозиториев</h6>
+                  <h6 class="mb-0">Среднее качество кода репозиториев (по 70ти бальной шкале)</h6>
                 </div>
                 <div class="card-body">
                   <canvas ref="repoCode"></canvas>
@@ -104,7 +104,7 @@
             <div class="col-md-6 mb-4">
               <div class="card h-100">
                 <div class="card-header bg-light">
-                  <h6 class="mb-0">Среднее качество оформления репозиториев</h6>
+                  <h6 class="mb-0">Среднее качество оформления репозиториев (по 30ти бальной шкале)</h6>
                 </div>
                 <div class="card-body">
                   <canvas ref="repoDecor"></canvas>
@@ -115,7 +115,7 @@
             <div class="col-md-6 mb-4">
               <div class="card h-100">
                 <div class="card-header bg-light">
-                  <h6 class="mb-0">Средний бонус репозиториев</h6>
+                  <h6 class="mb-0">Средний бонус репозиториев (по 20ти бальной шкале)</h6>
                 </div>
                 <div class="card-body">
                   <canvas ref="repoTeam"></canvas>
@@ -126,7 +126,7 @@
             <div class="col-md-6 mb-4">
               <div class="card h-100">
                 <div class="card-header bg-light">
-                  <h6 class="mb-0">Соотношение ваших языков программирования</h6>
+                  <h6 class="mb-0">Соотношение языков программирования в ваших репозиториях</h6>
                 </div>
                 <div class="card-body">
                   <canvas ref="myRepoLanguages"></canvas>
@@ -137,7 +137,7 @@
             <div class="col-md-6 mb-4">
               <div class="card h-100">
                 <div class="card-header bg-light">
-                  <h6 class="mb-0">Соотношение языков программирования пользователей</h6>
+                  <h6 class="mb-0">Соотношение языков программирования среди всех пользователей</h6>
                 </div>
                 <div class="card-body">
                   <canvas ref="allRepoLanguages"></canvas>
@@ -355,6 +355,7 @@ export default {
           scales: {
             y: {
               beginAtZero: true,
+              max:100
             }
           }
         }
@@ -417,6 +418,7 @@ export default {
           scales: {
             y: {
               beginAtZero: true,
+              max:70
             }
           }
         }
@@ -445,6 +447,7 @@ export default {
           scales: {
             y: {
               beginAtZero: true,
+              max:30
             }
           }
         }
@@ -473,6 +476,7 @@ export default {
           scales: {
             y: {
               beginAtZero: true,
+              max:20
             }
           }
         }

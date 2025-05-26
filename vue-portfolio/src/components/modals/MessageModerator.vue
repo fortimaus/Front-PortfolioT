@@ -104,7 +104,6 @@ export default {
     async show(id) {
       this.user = id
       await this.getComments()
-      this.messages.reverse()
       this.modalInstance.show()
     },
     async sendMessage(){

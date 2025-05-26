@@ -1,4 +1,27 @@
 <template>
+    <nav class="navbar px-4 navbar-expand-lg navbar-dark bg-dark text-center" >
+        <router-link to="/" class="navbar-brand">
+            <div class="logo-container text-center">
+                <span class="logo-text">Portfolio<span class="logo-highlight">T</span></span>
+            </div>
+        </router-link>
+        <div class="container-fluid">
+            <div class="navbar-nav mr-auto ">
+                <li class="nav-item">
+                  <a class="nav-link" @click="this.$router.push('/main')">Главная</a>
+                </li>
+                <li v-if="isAdmin || isModerator" class="nav-item">
+                  <a class="nav-link" @click="this.$router.push('/status')">Панель модератора</a>
+                </li>
+                <li v-if="isAdmin" class="nav-item">
+                  <a class="nav-link" @click="this.$router.push('/roles')">Панель админа</a>
+                </li>
+            </div>
+          <div class="d-flex navbar-brand">
+            <button type="button" class="btn btn-light" @click="exit()">Выйти</button>
+        </div>
+        </div>
+      </nav>
   <div class="container py-4">
     <h2 class="mb-4">Панель модератора</h2>
     
@@ -141,6 +164,13 @@ export default {
         else
           user.avatar = `data:image/png;base64,${user.preview}`;
       })
+      let role = this.parseJwt()
+      if(role == "Admin")
+            this.isAdmin = true;
+      if(role == "Moderator")
+          this.isModerator = true
+      if(!this.isAdmin && !this.isModerator)
+        this.$router.push("/main")
   },
   computed: {
     filteredUsers() {
@@ -187,6 +217,22 @@ export default {
         alert("Что-то пошло не так")
       })
     },
+    exit(){
+      localStorage.clear();
+      this.$router.push('/login');
+    },
+    parseJwt () {
+        var base64Url = localStorage.getItem('token').split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        console.log(jsonPayload)
+        let role = jsonPayload.replace("http://schemas.microsoft.com/ws/2008/06/identity/claims/", "")
+        let json = JSON.parse(role)
+        console.log(json)
+        return json.role;
+        },
     goOnPage(login){
       this.$router.push(`/${login}`)
     },
@@ -206,7 +252,14 @@ export default {
   font-weight: 600;
   background-color: #f8f9fa;
 }
-
+.logo-text {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+.logo-highlight {
+    color: #42b983;
+}
 .table img {
   object-fit: cover;
 }

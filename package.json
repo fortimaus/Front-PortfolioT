@@ -1,5 +1,8 @@
 {
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.6",
+    "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.4.9",
     "popper.js": "^1.16.1",
     "utils.js": "^1.0.1"

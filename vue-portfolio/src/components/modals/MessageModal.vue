@@ -1,7 +1,7 @@
 <template>
   <div class="modal fade" id="messagesModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-lg">
-      <div class="modal-content" style="max-height: 80vh;">
+      <div id="modalContent" class="modal-content" style="max-height: 80vh;">
         <div class="modal-header">
           <h5 class="modal-title">Сообщения</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -82,7 +82,6 @@ export default {
                 element.avatar = `data:image/png;base64,${element.avatar}`;
       })
         });
-      this.messages.reverse()
       this.modalInstance.show()
     },
     hide() {

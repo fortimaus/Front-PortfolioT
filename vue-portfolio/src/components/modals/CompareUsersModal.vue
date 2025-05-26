@@ -71,7 +71,7 @@
               <div class="col-md-6">
                 <div class="card h-100">
                   <div class="card-header">
-                    Сравнение баллов
+                    Сравнение средних баллов по репозиториям
                   </div>
                   <div class="card-body">
                     <canvas ref="comparisonChart"></canvas>
@@ -81,7 +81,7 @@
               <div class="col-md-6">
                 <div class="card h-100">
                   <div class="card-header">
-                    Сравнение оценок качества
+                    Сравнение оценок качества репозиториев
                   </div>
                   <div class="card-body">
                     <canvas ref="comparisonAnalisysChart"></canvas>

@@ -57,7 +57,7 @@
           <!-- Сравнение со средним значением -->
           <div class="card">
             <div class="card-header bg-light">
-              <h6 class="mb-0">Сравнение со средними баллами за декор по всем репозиториям</h6>
+              <h6 class="mb-0">Сравнение среднего балла за декор (по 30ти бальной шкале)</h6>
             </div>
             <div class="card-body">
               <canvas ref="comparisonChartDecor"></canvas>
@@ -66,7 +66,7 @@
 
           <div class="card">
             <div class="card-header bg-light">
-              <h6 class="mb-0">Сравнение со средними баллами за качество кода по всем репозиториям</h6>
+              <h6 class="mb-0">Сравнение среднего балла за качество кода (по 70ти бальной шкале)</h6>
             </div>
             <div class="card-body">
               <canvas ref="comparisonChartCode"></canvas>
@@ -75,7 +75,7 @@
 
           <div class="card">
             <div class="card-header bg-light">
-              <h6 class="mb-0">Сравнение со средними баллами за бонус по всем репозиториям</h6>
+              <h6 class="mb-0">Сравнение среднего балла за бонус (по 20ти бальной шкале)</h6>
             </div>
             <div class="card-body">
               <canvas ref="comparisonChartBonus"></canvas>
@@ -84,7 +84,7 @@
 
           <div class="card">
             <div class="card-header bg-light">
-              <h6 class="mb-0">Сравнение со средним оценкам по всем репозиториям</h6>
+              <h6 class="mb-0">Сравнение оценок репозиторияя (по 5ти бальной шкале)</h6>
             </div>
             <div class="card-body">
               <canvas ref="comparisonChart"></canvas>
